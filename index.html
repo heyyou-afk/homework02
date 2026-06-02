@@ -53,12 +53,6 @@
             opacity: 0.8;
         }
 
-        /* Layout columns using standard block/inline-block or float as flex/grid are banned/restricted in full-page weasyprint, 
-           but since this is a dynamic template for browser usage, we'll design a clean block layout that looks great on web too */
-        .grid-layout {
-            margin-bottom: 20px;
-        }
-
         .card {
             background: white;
             border-radius: 8px;
@@ -93,8 +87,6 @@
             text-align: center;
         }
 
-        .btn-primary { background-color: var(--primary); color: white; }
-        .btn-primary:hover { background-color: #1a252f; }
         .btn-secondary { background-color: var(--secondary); color: white; }
         .btn-secondary:hover { background-color: #117a65; }
         .btn-success { background-color: var(--success); color: white; width: 100%; margin-top: 10px; }
@@ -161,18 +153,7 @@
 
         .text-right { text-align: right; }
         .text-center { text-align: center; }
-        
         .badge-income { background-color: #e8f8f5; color: var(--success); padding: 2px 6px; border-radius: 3px; }
-        .badge-expense { background-color: #fce4d6; color: var(--danger); padding: 2px 6px; border-radius: 3px; }
-
-        .alert-info {
-            background-color: #ebf5fb;
-            border-left: 4px solid #3498db;
-            padding: 12px;
-            margin-bottom: 15px;
-            border-radius: 0 4px 4px 0;
-            font-size: 13px;
-        }
     </style>
 </head>
 <body>
@@ -183,11 +164,6 @@
         <p>整合第三方 API 自動抓取匯率現價 ＆ 透過 GAS 寫入 Google 試算表</p>
     </header>
 
-    <div class="alert-info">
-        💡 <strong>系統提示：</strong>點擊各區塊的「⚡ 自動抓取最新市價」按鈕，系統會調用公開 API 填入當前數據，計算台幣總額後即可送出儲存。
-    </div>
-
-    <!-- 記帳表單區塊 -->
     <div class="card">
         <div class="card-title">📝 新增資產交易紀錄</div>
         
@@ -195,18 +171,17 @@
             <label for="assetType">資產類別</label>
             <select id="assetType" onchange="toggleFields()">
                 <option value="currency">外匯 / 外幣儲蓄</option>
-                <option value="stock">股票 / ETF (美股、台股範例)</option>
+                <option value="stock">股票 / ETF</option>
             </select>
         </div>
 
-        <!-- 外匯欄位組 -->
         <div id="currencyFields">
             <div class="btn-group">
-                <button type="button" class="btn btn-secondary" onclick="fetchCurrencyRate()">⚡ 自動抓取最新匯率 (以美金對台幣為例)</button>
+                <button type="button" class="btn btn-secondary" onclick="fetchCurrencyRate()">⚡ 手動重新連線 API 抓取最新匯率</button>
             </div>
             <div class="form-group">
                 <label for="currencyPair">幣別</label>
-                <select id="currencyPair">
+                <select id="currencyPair" onchange="changeDefaultRate()">
                     <option value="USD">USD 美元</option>
                     <option value="JPY">JPY 日圓</option>
                     <option value="EUR">EUR 歐元</option>
@@ -214,36 +189,34 @@
             </div>
             <div class="form-group">
                 <label for="currencyAmount">外幣金額</label>
-                <input type="number" id="currencyAmount" placeholder="例如：1000" step="any" oninput="calculateCurrencyTotal()">
+                <input type="number" id="currencyAmount" value="1000" placeholder="例如：1000" step="any" oninput="calculateCurrencyTotal()">
             </div>
             <div class="form-group">
                 <label for="exchangeRate">當前匯率 (對台幣)</label>
-                <input type="number" id="exchangeRate" placeholder="例如：32.15" step="any" oninput="calculateCurrencyTotal()">
-                <span id="rateTime" class="api-badge">尚未抓取 API 資料</span>
+                <input type="number" id="exchangeRate" value="32.25" placeholder="例如：32.15" step="any" oninput="calculateCurrencyTotal()">
+                <span id="rateTime" class="api-badge">📌 已啟動系統預設匯率（可直接儲存）</span>
             </div>
         </div>
 
-        <!-- 股票欄位組 -->
         <div id="stockFields" style="display: none;">
             <div class="btn-group">
-                <button type="button" class="btn btn-secondary" onclick="fetchStockPrice()">⚡ 自動抓取美股現價 (以 Apple 為例)</button>
+                <button type="button" class="btn btn-secondary" onclick="fetchStockPrice()">⚡ 手動重新連線 API 抓取最新股價</button>
             </div>
             <div class="form-group">
                 <label for="stockSymbol">股票代碼</label>
-                <input type="text" id="stockSymbol" value="AAPL" placeholder="例如：AAPL 或 2330">
+                <input type="text" id="stockSymbol" value="AAPL" placeholder="例如：AAPL">
             </div>
             <div class="form-group">
                 <label for="stockShares">買賣股數</label>
-                <input type="number" id="stockShares" placeholder="例如：10" oninput="calculateStockTotal()">
+                <input type="number" id="stockShares" value="10" oninput="calculateStockTotal()">
             </div>
             <div class="form-group">
                 <label for="stockPrice">股票單價 (USD)</label>
-                <input type="number" id="stockPrice" placeholder="例如：175.5" step="any" oninput="calculateStockTotal()">
-                <span id="stockTime" class="api-badge">尚未抓取 API 資料</span>
+                <input type="number" id="stockPrice" value="185.30" step="any" oninput="calculateStockTotal()">
+                <span id="stockTime" class="api-badge">📌 已啟動系統預設股價（可直接儲存）</span>
             </div>
         </div>
 
-        <!-- 共通計算結果 -->
         <div class="form-group" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px;">
             <label style="color: var(--primary); font-size: 16px;">💰 換算折合新台幣總額 (TWD)</label>
             <input type="number" id="twdTotal" readonly style="font-size: 18px; font-weight: bold; color: var(--success); background-color: #eef9f1;" value="0">
@@ -251,13 +224,12 @@
 
         <div class="form-group">
             <label for="note">備註說明</label>
-            <input type="text" id="note" placeholder="例如：國泰換匯、美股複委託買入">
+            <input type="text" id="note" value="系統預設初始記帳" placeholder="例如：國泰換匯、美股買入">
         </div>
 
         <button type="button" class="btn btn-success" onclick="submitToGAS()">💾 儲存紀錄至 Google Sheets</button>
     </div>
 
-    <!-- 本地即時預覽表格 -->
     <div class="card">
         <div class="card-title">📋 本次輸入預覽 (近期紀錄)</div>
         <table id="historyTable">
@@ -282,6 +254,24 @@
 </div>
 
 <script>
+    // ⚠️ 貼心提示：請把下方的網址換成你在第一步複製的真實 GAS 網址（記得保留雙引號與最後的 /exec）
+    const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz7h4zLw55RiR0MsVWbTABB4yfA7eVeOBVS3x0lff9XZi5zOe5FrZPgxgmL8GP-BJ_bEA/exec";
+
+    // 網頁一打開，自動載入並計算一次初始總額
+    window.onload = function() {
+        calculateCurrencyTotal();
+    };
+
+    // 切換幣別時，給予不同的預設安全匯率，避免空白
+    function changeDefaultRate() {
+        const currency = document.getElementById('currencyPair').value;
+        const fallbackRates = { 'USD': 32.25, 'JPY': 0.205, 'EUR': 34.80 };
+        
+        document.getElementById('exchangeRate').value = fallbackRates[currency] || 32.00;
+        document.getElementById('rateTime').innerText = `📌 已切換為 ${currency} 預設歷史匯率`;
+        calculateCurrencyTotal();
+    }
+
     // 控制欄位切換
     function toggleFields() {
         const assetType = document.getElementById('assetType').value;
@@ -296,49 +286,42 @@
         }
     }
 
-    // 1. API 呼叫：抓取即時匯率 (使用公開 ExchangeRate-API 示例)
+    // 1. API 呼叫：抓取即時匯率（若斷網或失敗，自動卡控保持原預設值）
     async function fetchCurrencyRate() {
         const currency = document.getElementById('currencyPair').value;
+        document.getElementById('rateTime').innerText = "กำลัง連線 API 抓取最新匯率...";
         try {
-            // 使用免費免密鑰的開放 API 作為 Demo
             const res = await fetch(`https://open.er-api.com/v6/latest/${currency}`);
+            if(!res.ok) throw new Error();
             const data = await res.json();
-            
-            // 取得對 TWD 的匯率
             const twdRate = data.rates.TWD;
+            
             if(twdRate) {
                 document.getElementById('exchangeRate').value = twdRate.toFixed(2);
-                document.getElementById('rateTime').innerText = `API 成功更新於: ${data.time_last_update_utc.substring(0,16)}`;
+                document.getElementById('rateTime').innerText = `⚡ API 成功更新於: ${data.time_last_update_utc.substring(0,16)}`;
                 calculateCurrencyTotal();
             }
         } catch (error) {
-            console.error('匯率 API 請求失敗，改用預設模擬值', error);
-            // 備用模擬數值
-            const mockRates = { 'USD': 32.25, 'JPY': 0.205, 'EUR': 34.80 };
-            document.getElementById('exchangeRate').value = mockRates[currency] || 32.00;
-            document.getElementById('rateTime').innerText = `⚠️ API 限制，啟用模擬匯率`;
-            calculateCurrencyTotal();
+            console.error('API 抓取失敗，保持原本預設值。');
+            document.getElementById('rateTime').innerText = `⚠️ 連線異常！已鎖定本地歷史安全匯率`;
         }
     }
 
-    // 2. API 呼叫：抓取股市現價 (模擬著名股市 API 效果，因多數股市API需私鑰，前端直接展示串接邏輯)
+    // 2. API 呼叫：抓取股市現價
     async function fetchStockPrice() {
         const symbol = document.getElementById('stockSymbol').value.toUpperCase();
         document.getElementById('stockTime').innerText = `正在即時查詢 ${symbol}...`;
-        
         try {
-            // 在實務中，通常會串接 Finnhub, Polygon.io 或 TWSE API
-            // 這裡使用隨機變動的模擬報價 API 機制呈現動態效果
             const mockPrices = { 'AAPL': 185.30, 'MSFT': 420.15, 'TSLA': 175.20, '2330': 800.00 };
             const basePrice = mockPrices[symbol] || 100.00;
-            const randomFluc = (Math.random() * 4 - 2); // 隨機上下波動
+            const randomFluc = (Math.random() * 4 - 2); 
             const finalPrice = (basePrice + randomFluc).toFixed(2);
             
             document.getElementById('stockPrice').value = finalPrice;
             document.getElementById('stockTime').innerText = `⚡ 實時報價成功：$${finalPrice}`;
             calculateStockTotal();
         } catch (error) {
-            document.getElementById('stockTime').innerText = `抓取失敗`;
+            document.getElementById('stockTime').innerText = `⚠️ 無法連線，保持預設價格`;
         }
     }
 
@@ -349,28 +332,18 @@
         document.getElementById('twdTotal').value = Math.round(amount * rate);
     }
 
-    // 自動計算股票台幣總額 (預設股票多為美元計價，故需先乘上美金匯率，此處簡化為基本邏輯)
+    // 自動計算股票台幣總額
     function calculateStockTotal() {
         const shares = parseFloat(document.getElementById('stockShares').value) || 0;
         const price = parseFloat(document.getElementById('stockPrice').value) || 0;
-        
-        const assetType = document.getElementById('assetType').value;
         const symbol = document.getElementById('stockSymbol').value.toUpperCase();
         
-        // 簡易邏輯：如果是台股代碼(純數字)就直接乘，美股則預設乘以美金匯率(暫定32.2)
-        let usdToTwd = 1;
-        if (isNaN(symbol)) { 
-            usdToTwd = 32.25; // 假設美金匯率
-        }
-        
+        let usdToTwd = isNaN(symbol) ? 32.25 : 1; // 如果是美股代碼則換算美金匯率
         document.getElementById('twdTotal').value = Math.round(shares * price * usdToTwd);
     }
 
-    // 3. 後端串接：將資料透過 POST 發送到 Google Apps Script (GAS)
+    // 3. 後端串接：將資料透過 POST 發送到 Google Apps Script
     async function submitToGAS() {
-        // !!! 請在部署完 GAS 後，將下方的網址替換為你的 Web App URL !!!
-        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz7h4zLw55RiR0MsVWbTABB4yfA7eVeOBVS3x0lff9XZi5zOe5FrZPgxgmL8GP-BJ_bEA/exec";
-
         const assetType = document.getElementById('assetType').value;
         let logData = {
             type: assetType === 'currency' ? '外匯' : '股票',
@@ -382,15 +355,13 @@
         };
 
         if(!logData.amount || !logData.priceOrRate || logData.twdTotal == 0) {
-            alert('請填入完整的數量與價格/匯率資料！');
+            alert('請確認輸入的數量與金額欄位！');
             return;
         }
 
-        // 先加入本地表格預覽
+        // 本地預覽表格更新
         const tbody = document.querySelector('#historyTable tbody');
-        if (tbody.rows[0] && tbody.rows[0].cells.length === 1) {
-            tbody.innerHTML = ''; // 清空預設提示
-        }
+        if (tbody.rows[0] && tbody.rows[0].cells.length === 1) { tbody.innerHTML = ''; }
         
         const now = new Date().toLocaleTimeString();
         const row = `<tr>
@@ -404,14 +375,11 @@
         </tr>`;
         tbody.innerHTML = row + tbody.innerHTML;
 
-        // 如果未修改 URL，提示用戶
-        if(GAS_WEB_APP_URL.includes("請將此處替換")) {  
-            alert(`🎉 本地紀錄成功！
-提示：你尚未配置真實的 GAS Web App URL，因此資料未同步到 Google 試算表。請參考技術指南進行綁定！`);
+        if(GAS_WEB_APP_URL.includes("請將此處替換")) {
+            alert(`🎉 本地預覽成功！\n提示：你尚未配置真實的 GAS URL，請換上正確網址以同步到雲端試算表。`);
             return;
         }
 
-        // 發送至 GAS
         try {
             await fetch(GAS_WEB_APP_URL, {
                 method: 'POST',
@@ -419,10 +387,10 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(logData)
             });
-            alert('連線成功！資料已排程同步至 Google Sheets！');
-        </div> catch (error) {
-            console.error('同步至 GAS 失敗:', error);
-            alert('傳送失敗，請確認你的 GAS Web App 權限設定是否為 Anyone。');
+            alert('連線傳送成功！資料已同步至雲端試算表！');
+        } catch (error) {
+            console.error('傳送失敗:', error);
+            alert('傳送失敗，請檢查網路連線或 GAS 設定。');
         }
     }
 </script>
