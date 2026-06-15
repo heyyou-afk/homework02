@@ -170,7 +170,7 @@
         <div class="form-group">
             <label for="assetType">資產類別</label>
             <select id="assetType" onchange="toggleFields()">
-                <option value="currency">外匯 / 外幣儲蓄</option>
+                <option value="currency">外匯 / 外幣儲蓄 / 旅遊外幣</option>
                 <option value="stock">股票 / ETF</option>
             </select>
         </div>
@@ -180,20 +180,28 @@
                 <button type="button" class="btn btn-secondary" onclick="fetchCurrencyRate()">⚡ 手動重新連線 API 抓取最新匯率</button>
             </div>
             <div class="form-group">
-                <label for="currencyPair">幣別</label>
+                <label for="currencyPair">選擇幣別 (依熱門旅遊與投資排行)</label>
                 <select id="currencyPair" onchange="changeDefaultRate()">
-                    <option value="USD">USD 美元</option>
-                    <option value="JPY">JPY 日圓</option>
-                    <option value="EUR">EUR 歐元</option>
+                    <option value="JPY">🇯🇵 JPY 日圓</option>
+                    <option value="CNY">🇨🇳 CNY 人民幣</option>
+                    <option value="KRW">🇰🇷 KRW 韓元</option>
+                    <option value="HKD">🇭🇰 HKD 香港元</option>
+                    <option value="VND">🇻🇳 VND 越南盾</option>
+                    <option value="THB">🇹🇭 THB 泰國銖</option>
+                    <option value="USD">🇺🇸 USD 美元</option>
+                    <option value="MOP">🇲🇴 MOP 澳門幣</option>
+                    <option value="SGD">🇸🇬 SGD 新加坡元</option>
+                    <option value="MYR">🇲🇾 MYR 馬來西亞林吉特</option>
+                    <option value="ZWG">🇿🇼 ZWG 辛巴威元</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="currencyAmount">外幣金額</label>
-                <input type="number" id="currencyAmount" value="1000" placeholder="例如：1000" step="any" oninput="calculateCurrencyTotal()">
+                <label for="currencyAmount">外幣金額 / 當地貨幣數量</label>
+                <input type="number" id="currencyAmount" value="10000" placeholder="例如：10000" step="any" oninput="calculateCurrencyTotal()">
             </div>
             <div class="form-group">
-                <label for="exchangeRate">當前匯率 (對台幣)</label>
-                <input type="number" id="exchangeRate" value="32.25" placeholder="例如：32.15" step="any" oninput="calculateCurrencyTotal()">
+                <label for="exchangeRate">當前匯率 (外幣對新台幣 TWD)</label>
+                <input type="number" id="exchangeRate" value="0.2050" placeholder="例如：0.205" step="any" oninput="calculateCurrencyTotal()">
                 <span id="rateTime" class="api-badge">📌 已啟動系統預設匯率（可直接儲存）</span>
             </div>
         </div>
@@ -224,7 +232,7 @@
 
         <div class="form-group">
             <label for="note">備註說明</label>
-            <input type="text" id="note" value="系統預設初始記帳" placeholder="例如：國泰換匯、美股買入">
+            <input type="text" id="note" value="海外旅遊/投資記帳" placeholder="例如：換匯、買入">
         </div>
 
         <button type="button" class="btn btn-success" onclick="submitToGAS()">💾 儲存紀錄至 Google Sheets</button>
@@ -254,21 +262,33 @@
 </div>
 
 <script>
-    // ⚠️ 貼心提示：請把下方的網址換成你在第一步複製的真實 GAS 網址（記得保留雙引號與最後的 /exec）
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz7h4zLw55RiR0MsVWbTABB4yfA7eVeOBVS3x0lff9XZi5zOe5FrZPgxgmL8GP-BJ_bEA/exec";
+
+    // 11 國貨幣對新台幣的預設安全歷史匯率庫（包含辛巴威元 0.0979）
+    const fallbackRates = { 
+        'JPY': 0.2050,   // 日本日圓
+        'CNY': 4.4500,   // 中國大陸人民幣
+        'KRW': 0.0230,   // 韓國韓元
+        'HKD': 4.1200,   // 香港元
+        'VND': 0.0013,   // 越南盾
+        'THB': 0.8800,   // 泰國銖
+        'USD': 32.2500,  // 美國美元
+        'MOP': 4.0000,   // 澳門幣
+        'SGD': 23.8000,  // 新加坡元
+        'MYR': 6.8500,   // 馬來西亞林吉特
+        'ZWG': 0.0979    // 🇿🇼 辛巴威元 (1 ZWG = 0.0979 TWD)
+    };
 
     // 網頁一打開，自動載入並計算一次初始總額
     window.onload = function() {
         calculateCurrencyTotal();
     };
 
-    // 切換幣別時，給予不同的預設安全匯率，避免空白
+    // 當切換選單中的國家貨幣時，立即帶入對應的預設歷史匯率
     function changeDefaultRate() {
         const currency = document.getElementById('currencyPair').value;
-        const fallbackRates = { 'USD': 32.25, 'JPY': 0.205, 'EUR': 34.80 };
-        
-        document.getElementById('exchangeRate').value = fallbackRates[currency] || 32.00;
-        document.getElementById('rateTime').innerText = `📌 已切換為 ${currency} 預設歷史匯率`;
+        document.getElementById('exchangeRate').value = fallbackRates[currency] || 1.00;
+        document.getElementById('rateTime').innerText = `📌 已切換為 ${currency} 系統預設歷史匯率`;
         calculateCurrencyTotal();
     }
 
@@ -286,10 +306,10 @@
         }
     }
 
-    // 1. API 呼叫：抓取即時匯率（若斷網或失敗，自動卡控保持原預設值）
+    // 1. API 呼叫：抓取即時匯率
     async function fetchCurrencyRate() {
         const currency = document.getElementById('currencyPair').value;
-        document.getElementById('rateTime').innerText = "กำลัง連線 API 抓取最新匯率...";
+        document.getElementById('rateTime').innerText = "正在連線 API 抓取最新匯率...";
         try {
             const res = await fetch(`https://open.er-api.com/v6/latest/${currency}`);
             if(!res.ok) throw new Error();
@@ -297,12 +317,12 @@
             const twdRate = data.rates.TWD;
             
             if(twdRate) {
-                document.getElementById('exchangeRate').value = twdRate.toFixed(2);
+                document.getElementById('exchangeRate').value = twdRate.toFixed(4);
                 document.getElementById('rateTime').innerText = `⚡ API 成功更新於: ${data.time_last_update_utc.substring(0,16)}`;
                 calculateCurrencyTotal();
             }
         } catch (error) {
-            console.error('API 抓取失敗，保持原本預設值。');
+            console.error('API 抓取失敗，自動啟動安全防線。');
             document.getElementById('rateTime').innerText = `⚠️ 連線異常！已鎖定本地歷史安全匯率`;
         }
     }
@@ -338,7 +358,7 @@
         const price = parseFloat(document.getElementById('stockPrice').value) || 0;
         const symbol = document.getElementById('stockSymbol').value.toUpperCase();
         
-        let usdToTwd = isNaN(symbol) ? 32.25 : 1; // 如果是美股代碼則換算美金匯率
+        let usdToTwd = isNaN(symbol) ? fallbackRates['USD'] : 1; 
         document.getElementById('twdTotal').value = Math.round(shares * price * usdToTwd);
     }
 
@@ -359,7 +379,6 @@
             return;
         }
 
-        // 本地預覽表格更新
         const tbody = document.querySelector('#historyTable tbody');
         if (tbody.rows[0] && tbody.rows[0].cells.length === 1) { tbody.innerHTML = ''; }
         
@@ -374,11 +393,6 @@
             <td>${logData.note}</td>
         </tr>`;
         tbody.innerHTML = row + tbody.innerHTML;
-
-        if(GAS_WEB_APP_URL.includes("請將此處替換")) {
-            alert(`🎉 本地預覽成功！\n提示：你尚未配置真實的 GAS URL，請換上正確網址以同步到雲端試算表。`);
-            return;
-        }
 
         try {
             await fetch(GAS_WEB_APP_URL, {
