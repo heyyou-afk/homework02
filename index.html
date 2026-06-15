@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>即時匯率/股市記帳本</title>
+    <title>即時匯率/股市記帳本 - 自由自訂幣別版</title>
     <style>
         :root {
             --primary: #2c3e50;
             --secondary: #16a085;
             --success: #27ae60;
+            --info: #2980b9;
             --danger: #c0392b;
             --light: #f8f9fa;
             --dark: #34495e;
@@ -29,7 +30,7 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
         }
 
@@ -91,6 +92,8 @@
         .btn-secondary:hover { background-color: #117a65; }
         .btn-success { background-color: var(--success); color: white; width: 100%; margin-top: 10px; }
         .btn-success:hover { background-color: #1e7e34; }
+        .btn-info { background-color: var(--info); color: white; }
+        .btn-info:hover { background-color: #1f618d; }
 
         .form-group {
             margin-bottom: 15px;
@@ -126,6 +129,25 @@
             font-size: 12px;
             margin-top: 5px;
             font-weight: bold;
+        }
+
+        /* 網格佈局 */
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .summary-box {
+            background-color: #eef9f1;
+            border: 1px solid var(--success);
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--success);
+            margin-top: 15px;
         }
 
         table {
@@ -164,6 +186,25 @@
         <p>整合第三方 API 自動抓取匯率現價 ＆ 透過 GAS 寫入 Google 試算表</p>
     </header>
 
+    <div class="card" style="border-left: 5px solid var(--info); background-color: #fdfefe;">
+        <div class="card-title" style="color: var(--info); border-bottom-color: var(--info);">➕ 自行擴充自訂新幣別與匯率</div>
+        <div class="filter-grid" style="margin-bottom: 5px;">
+            <div class="form-group">
+                <label for="customCurrencyCode">新幣別英文代碼</label>
+                <input type="text" id="customCurrencyCode" placeholder="例如：BTC、EUR、CAD">
+            </div>
+            <div class="form-group">
+                <label for="customCurrencyName">幣別中文名稱描述</label>
+                <input type="text" id="customCurrencyName" placeholder="例如：比特幣、歐元、加幣">
+            </div>
+            <div class="form-group">
+                <label for="customCurrencyRate">自訂對台幣初始匯率</label>
+                <input type="number" id="customCurrencyRate" placeholder="例如：32.5" step="any">
+            </div>
+        </div>
+        <button type="button" class="btn btn-info" style="font-size:13px; padding: 8px 16px;" onclick="addNewCustomCurrency()">✨ 立即新增至系統選單</button>
+    </div>
+
     <div class="card">
         <div class="card-title">📝 新增資產交易紀錄</div>
         
@@ -180,7 +221,7 @@
                 <button type="button" class="btn btn-secondary" onclick="fetchCurrencyRate()">⚡ 手動重新連線 API 抓取最新匯率</button>
             </div>
             <div class="form-group">
-                <label for="currencyPair">選擇幣別 (依熱門旅遊與投資排行)</label>
+                <label for="currencyPair">選擇幣別 (包含你自訂新增的貨幣)</label>
                 <select id="currencyPair" onchange="changeDefaultRate()">
                     <option value="JPY">🇯🇵 JPY 日圓</option>
                     <option value="CNY">🇨🇳 CNY 人民幣</option>
@@ -219,7 +260,7 @@
                 <input type="number" id="stockShares" value="10" oninput="calculateStockTotal()">
             </div>
             <div class="form-group">
-                <label for="stockPrice">股票單價 (USD)</label>
+                <label interpreters for="stockPrice">股票單價 (USD)</label>
                 <input type="number" id="stockPrice" value="185.30" step="any" oninput="calculateStockTotal()">
                 <span id="stockTime" class="api-badge">📌 已啟動系統預設股價（可直接儲存）</span>
             </div>
@@ -238,12 +279,50 @@
         <button type="button" class="btn btn-success" onclick="submitToGAS()">💾 儲存紀錄至 Google Sheets</button>
     </div>
 
+    <div class="card" style="background-color: #fcfcfc; border-left: 5px solid var(--secondary);">
+        <div class="card-title" style="color: var(--secondary);">🔍 記帳分類與篩選工具</div>
+        <div class="filter-grid">
+            <div class="form-group">
+                <label for="filterDate">1. 依日期分類/篩選</label>
+                <input type="date" id="filterDate" onchange="filterRecords()">
+            </div>
+            <div class="form-group">
+                <label for="filterHour">2. 依小時分類/篩選 (24小時制)</label>
+                <select id="filterHour" onchange="filterRecords()">
+                    <option value="all">顯示全部小時</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="filterCurrency">3. 依幣別/代碼分類</label>
+                <select id="filterCurrency" onchange="filterRecords()">
+                    <option value="all">顯示全部幣別</option>
+                    <option value="JPY">JPY 日圓</option>
+                    <option value="CNY">CNY 人民幣</option>
+                    <option value="KRW">KRW 韓元</option>
+                    <option value="HKD">HKD 香港元</option>
+                    <option value="VND">VND 越南盾</option>
+                    <option value="THB">THB 泰國銖</option>
+                    <option value="USD">USD 美元 / 美股</option>
+                    <option value="MOP">MOP 澳門幣</option>
+                    <option value="SGD">SGD 新加坡元</option>
+                    <option value="MYR">MYR 馬來西亞林吉特</option>
+                    <option value="ZWG">ZWG 辛巴威元</option>
+                </select>
+            </div>
+        </div>
+        <button type="button" class="btn btn-secondary" style="padding: 6px 12px; font-size:12px;" onclick="resetFilters()">🔄 清除所有篩選條件</button>
+        <div class="summary-box" id="filterSummary">
+            📈 目前篩選條件下折合台幣總計：$0 TWD
+        </div>
+    </div>
+
     <div class="card">
-        <div class="card-title">📋 本次輸入預覽 (近期紀錄)</div>
+        <div class="card-title">📋 歷史明細紀錄 (支援動態分類篩選)</div>
         <table id="historyTable">
             <thead>
                 <tr>
-                    <th>時間</th>
+                    <th>日期</th>
+                    <th>時間(小時)</th>
                     <th>資產類別</th>
                     <th>代碼/幣別</th>
                     <th>數量/外幣</th>
@@ -252,9 +331,9 @@
                     <th>備註</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td colspan="7" class="text-center" style="color: #999;">暫無本地新增紀錄，送出後將同步儲存至雲端試算表</td>
+            <tbody id="historyTbody">
+                <tr id="emptyHintRow">
+                    <td colspan="8" class="text-center" style="color: #999;">暫無紀錄，請在上方新增交易</td>
                 </tr>
             </tbody>
         </table>
@@ -264,35 +343,85 @@
 <script>
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz7h4zLw55RiR0MsVWbTABB4yfA7eVeOBVS3x0lff9XZi5zOe5FrZPgxgmL8GP-BJ_bEA/exec";
 
-    // 11 國貨幣對新台幣的預設安全歷史匯率庫（包含辛巴威元 0.0979）
-    const fallbackRates = { 
-        'JPY': 0.2050,   // 日本日圓
-        'CNY': 4.4500,   // 中國大陸人民幣
-        'KRW': 0.0230,   // 韓國韓元
-        'HKD': 4.1200,   // 香港元
-        'VND': 0.0013,   // 越南盾
-        'THB': 0.8800,   // 泰國銖
-        'USD': 32.2500,  // 美國美元
-        'MOP': 4.0000,   // 澳門幣
-        'SGD': 23.8000,  // 新加坡元
-        'MYR': 6.8500,   // 馬來西亞林吉特
-        'ZWG': 0.0979    // 🇿🇼 辛巴威元 (1 ZWG = 0.0979 TWD)
+    let allRecordsMemory = [];
+
+    // 動態系統資料庫：預設內建 11 種，使用者可以在前台自由擴充！
+    let fallbackRates = { 
+        'JPY': 0.2050, 'CNY': 4.4500, 'KRW': 0.0230, 'HKD': 4.1200, 
+        'VND': 0.0013, 'THB': 0.8800, 'USD': 32.2500, 'MOP': 4.0000, 
+        'SGD': 23.8000, 'MYR': 6.8500, 'ZWG': 0.0979
     };
 
-    // 網頁一打開，自動載入並計算一次初始總額
     window.onload = function() {
         calculateCurrencyTotal();
+        
+        // 生成 00-23 小時篩選選單
+        const hourSelect = document.getElementById('filterHour');
+        for(let i=0; i<24; i++) {
+            let hStr = i < 10 ? '0' + i : i;
+            let opt = document.createElement('option');
+            opt.value = hStr;
+            opt.innerText = hStr + ':00 ~ ' + hStr + ':59';
+            hourSelect.appendChild(opt);
+        }
+        
+        document.getElementById('filterDate').value = new Date().toISOString().substring(0, 10);
     };
 
-    // 當切換選單中的國家貨幣時，立即帶入對應的預設歷史匯率
+    // ⚡【重要全新功能】讓使用者在前台動態自行新增幣別與匯率的邏輯 ⚡
+    function addNewCustomCurrency() {
+        const codeInput = document.getElementById('customCurrencyCode').value.trim().toUpperCase();
+        const nameInput = document.getElementById('customCurrencyName').value.trim();
+        const rateInput = parseFloat(document.getElementById('customCurrencyRate').value);
+
+        if(!codeInput || !nameInput || isNaN(rateInput)) {
+            alert('❌ 請填寫完整的欄位：幣別代碼、中文描述及匯率數值！');
+            return;
+        }
+
+        // 1. 檢查是否已經存在
+        if(fallbackRates.hasOwnProperty(codeInput)) {
+            // 如果存在，直接幫使用者覆蓋新匯率
+            fallbackRates[codeInput] = rateInput;
+            alert(`🔄 幣別 ${codeInput} 已存在，已成功將其系統匯率更新為：${rateInput}`);
+        } else {
+            // 如果是全新幣別，寫入資料庫
+            fallbackRates[codeInput] = rateInput;
+
+            // 2. 自動塞入交易「選擇幣別」的下拉選單
+            const mainSelect = document.getElementById('currencyPair');
+            let mainOpt = document.createElement('option');
+            mainOpt.value = codeInput;
+            mainOpt.innerText = `✨ ${codeInput} ${nameInput}`;
+            mainSelect.appendChild(mainOpt);
+
+            // 3. 自動塞入「分類與篩選工具」的下拉選單
+            const filterSelect = document.getElementById('filterCurrency');
+            let filterOpt = document.createElement('option');
+            filterOpt.value = codeInput;
+            filterOpt.innerText = `${codeInput} ${nameInput}`;
+            filterSelect.appendChild(filterOpt);
+
+            alert(`🎉 成功新增自訂幣別：[${codeInput} ${nameInput}]，初始預設匯率為 ${rateInput}！`);
+        }
+
+        // 4. 自動將目前的記帳欄位切換到剛新增的這個幣別，並重新算總額
+        document.getElementById('currencyPair').value = codeInput;
+        changeDefaultRate();
+
+        // 5. 清空擴充控制台的輸入欄位
+        document.getElementById('customCurrencyCode').value = '';
+        document.getElementById('customCurrencyName').value = '';
+        document.getElementById('customCurrencyRate').value = '';
+    }
+
     function changeDefaultRate() {
         const currency = document.getElementById('currencyPair').value;
         document.getElementById('exchangeRate').value = fallbackRates[currency] || 1.00;
-        document.getElementById('rateTime').innerText = `📌 已切換為 ${currency} 系統預設歷史匯率`;
+        document.getElementById('rateTime').innerText = `📌 已切換為 ${currency} 系統預設/自訂匯率`;
         calculateCurrencyTotal();
     }
 
-    // 控制欄位切換
     function toggleFields() {
         const assetType = document.getElementById('assetType').value;
         if(assetType === 'currency') {
@@ -306,7 +435,6 @@
         }
     }
 
-    // 1. API 呼叫：抓取即時匯率
     async function fetchCurrencyRate() {
         const currency = document.getElementById('currencyPair').value;
         document.getElementById('rateTime').innerText = "正在連線 API 抓取最新匯率...";
@@ -315,19 +443,16 @@
             if(!res.ok) throw new Error();
             const data = await res.json();
             const twdRate = data.rates.TWD;
-            
             if(twdRate) {
                 document.getElementById('exchangeRate').value = twdRate.toFixed(4);
                 document.getElementById('rateTime').innerText = `⚡ API 成功更新於: ${data.time_last_update_utc.substring(0,16)}`;
                 calculateCurrencyTotal();
             }
         } catch (error) {
-            console.error('API 抓取失敗，自動啟動安全防線。');
-            document.getElementById('rateTime').innerText = `⚠️ 連線異常！已鎖定本地歷史安全匯率`;
+            document.getElementById('rateTime').innerText = `⚠️ 連線異常或自訂幣別！已鎖定本地預設/自訂匯率`;
         }
     }
 
-    // 2. API 呼叫：抓取股市現價
     async function fetchStockPrice() {
         const symbol = document.getElementById('stockSymbol').value.toUpperCase();
         document.getElementById('stockTime').innerText = `正在即時查詢 ${symbol}...`;
@@ -336,7 +461,6 @@
             const basePrice = mockPrices[symbol] || 100.00;
             const randomFluc = (Math.random() * 4 - 2); 
             const finalPrice = (basePrice + randomFluc).toFixed(2);
-            
             document.getElementById('stockPrice').value = finalPrice;
             document.getElementById('stockTime').innerText = `⚡ 實時報價成功：$${finalPrice}`;
             calculateStockTotal();
@@ -345,55 +469,47 @@
         }
     }
 
-    // 自動計算外匯台幣總額
     function calculateCurrencyTotal() {
         const amount = parseFloat(document.getElementById('currencyAmount').value) || 0;
         const rate = parseFloat(document.getElementById('exchangeRate').value) || 0;
         document.getElementById('twdTotal').value = Math.round(amount * rate);
     }
 
-    // 自動計算股票台幣總額
     function calculateStockTotal() {
         const shares = parseFloat(document.getElementById('stockShares').value) || 0;
         const price = parseFloat(document.getElementById('stockPrice').value) || 0;
         const symbol = document.getElementById('stockSymbol').value.toUpperCase();
-        
         let usdToTwd = isNaN(symbol) ? fallbackRates['USD'] : 1; 
         document.getElementById('twdTotal').value = Math.round(shares * price * usdToTwd);
     }
 
-    // 3. 後端串接：將資料透過 POST 發送到 Google Apps Script
     async function submitToGAS() {
         const assetType = document.getElementById('assetType').value;
+        const nowObj = new Date();
+        const dateTag = nowObj.toISOString().substring(0, 10);
+        const hourTag = nowObj.getHours() < 10 ? '0' + nowObj.getHours() : '' + nowObj.getHours();
+        const timeStr = nowObj.toLocaleTimeString();
+
         let logData = {
+            date: dateTag,
+            hour: hourTag,
+            time: timeStr,
             type: assetType === 'currency' ? '外匯' : '股票',
             symbol: assetType === 'currency' ? document.getElementById('currencyPair').value : document.getElementById('stockSymbol').value.toUpperCase(),
-            amount: assetType === 'currency' ? document.getElementById('currencyAmount').value : document.getElementById('stockShares').value,
-            priceOrRate: assetType === 'currency' ? document.getElementById('exchangeRate').value : document.getElementById('stockPrice').value,
-            twdTotal: document.getElementById('twdTotal').value,
+            amount: document.getElementById('currencyAmount').value,
+            priceOrRate: document.getElementById('exchangeRate').value,
+            twdTotal: parseInt(document.getElementById('twdTotal').value) || 0,
             note: document.getElementById('note').value || '無'
         };
 
-        if(!logData.amount || !logData.priceOrRate || logData.twdTotal == 0) {
-            alert('請確認輸入的數量與金額欄位！');
-            return;
+        if(assetType !== 'currency') {
+            logData.amount = document.getElementById('stockShares').value;
+            logData.priceOrRate = document.getElementById('stockPrice').value;
         }
 
-        const tbody = document.querySelector('#historyTable tbody');
-        if (tbody.rows[0] && tbody.rows[0].cells.length === 1) { tbody.innerHTML = ''; }
+        allRecordsMemory.unshift(logData);
+        renderTable();
         
-        const now = new Date().toLocaleTimeString();
-        const row = `<tr>
-            <td>${now}</td>
-            <td><span class="badge-income">${logData.type}</span></td>
-            <td>${logData.symbol}</td>
-            <td>${logData.amount}</td>
-            <td>${logData.priceOrRate}</td>
-            <td class="text-right" style="font-weight:bold; color:var(--success);">$${parseInt(logData.twdTotal).toLocaleString()}</td>
-            <td>${logData.note}</td>
-        </tr>`;
-        tbody.innerHTML = row + tbody.innerHTML;
-
         try {
             await fetch(GAS_WEB_APP_URL, {
                 method: 'POST',
@@ -401,11 +517,66 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(logData)
             });
-            alert('連線傳送成功！資料已同步至雲端試算表！');
+            alert('本筆資產紀錄已同步至 Google 雲端試算表！');
         } catch (error) {
-            console.error('傳送失敗:', error);
-            alert('傳送失敗，請檢查網路連線或 GAS 設定。');
+            alert('雲端同步失敗，但已保存在網頁本地臨時清單中。');
         }
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('historyTbody');
+        tbody.innerHTML = '';
+
+        if(allRecordsMemory.length === 0) {
+            tbody.innerHTML = `<tr id="emptyHintRow"><td colspan="8" class="text-center" style="color: #999;">暫無紀錄，請在上方新增交易</td></tr>`;
+            document.getElementById('filterSummary').innerText = `📈 目前篩選條件下折合台幣總計：$0 TWD`;
+            return;
+        }
+
+        const filterDate = document.getElementById('filterDate').value;
+        const filterHour = document.getElementById('filterHour').value;
+        const filterCurrency = document.getElementById('filterCurrency').value;
+
+        let filteredSum = 0;
+
+        allRecordsMemory.forEach(item => {
+            const matchDate = !filterDate || item.date === filterDate;
+            const matchHour = filterHour === 'all' || item.hour === filterHour;
+            const matchCurr = filterCurrency === 'all' || item.symbol === filterCurrency;
+
+            if(matchDate && matchHour && matchCurr) {
+                filteredSum += item.twdTotal;
+                
+                const row = `<tr>
+                    <td><strong>${item.date}</strong></td>
+                    <td>${item.time} (${item.hour}點)</td>
+                    <td><span class="badge-income">${item.type}</span></td>
+                    <td><code>${item.symbol}</code></td>
+                    <td>${item.amount}</td>
+                    <td>${item.priceOrRate}</td>
+                    <td class="text-right" style="font-weight:bold; color:var(--success);">$${item.twdTotal.toLocaleString()}</td>
+                    <td>${item.note}</td>
+                </tr>`;
+                tbody.innerHTML += row;
+            }
+        });
+
+        if(tbody.innerHTML === '') {
+            tbody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: #c0392b;">⚠️ 沒有符合目前分類篩選條件的記帳紀錄</td></tr>`;
+        }
+
+        document.getElementById('filterSummary').innerText = `📈 目前篩選條件下折合台幣總計：$${filteredSum.toLocaleString()} TWD`;
+    }
+
+    function filterRecords() {
+        renderTable();
+    }
+
+    function resetFilters() {
+        document.getElementById('filterDate').value = '';
+        document.getElementById('filterHour').value = 'all';
+        document.getElementById('filterCurrency').value = 'all';
+        renderTable();
     }
 </script>
 
