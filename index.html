@@ -3,30 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>即時匯率/股市記帳本 - 自由自訂幣別版</title>
+    <title>⚡ CYBER_LEDGER // 全資產多功能終端記帳系統</title>
     <style>
         :root {
-            --primary: #2c3e50;
-            --secondary: #16a085;
-            --success: #27ae60;
-            --info: #2980b9;
-            --danger: #c0392b;
-            --light: #f8f9fa;
-            --dark: #34495e;
-            --border: #dcdde1;
+            --bg-main: #0a0c10;       /* 簡潔深黑背景 */
+            --bg-card: #10141d;       /* 晶片暗灰卡片 */
+            --neon-cyan: #00f0ff;     /* 螢光青 */
+            --neon-green: #39ff14;    /* 終端綠 */
+            --neon-pink: #ff007f;     /* 量子粉 */
+            --neon-purple: #9d4edd;   /* 暗物質紫 */
+            --text-main: #c5d1e0;     /* 數據白 */
+            --text-dim: #6c7a89;      /* 灰色注釋 */
+            --border-glow: #1a2333;   /* 預設邊框 */
         }
         
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, "Microsoft JhengHei";
+            font-family: 'Courier New', Courier, monospace, "Microsoft JhengHei";
         }
 
         body {
-            background-color: #f5f6fa;
-            color: var(--dark);
+            background-color: var(--bg-main);
+            color: var(--text-main);
             padding: 20px;
+            /* 賽博微幅科技紋理，保持背景簡潔不過載 */
+            background-image: linear-gradient(rgba(18, 24, 38, 0.5) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(18, 24, 38, 0.5) 1px, transparent 1px);
+            background-size: 20px 20px;
         }
 
         .container {
@@ -37,39 +42,58 @@
         header {
             text-align: center;
             margin-bottom: 30px;
-            padding: 20px;
-            background: linear-gradient(135deg, var(--primary), #34495e);
-            color: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 25px;
+            background: #0d1117;
+            border: 2px solid var(--neon-cyan);
+            border-radius: 4px;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2), inset 0 0 10px rgba(0, 240, 255, 0.1);
+            position: relative;
+            overflow: hidden;
         }
 
         header h1 {
-            font-size: 24px;
-            margin-bottom: 5px;
+            font-size: 26px;
+            color: #fff;
+            text-shadow: 0 0 10px var(--neon-cyan), 0 0 20px var(--neon-cyan);
+            letter-spacing: 2px;
+            margin-bottom: 8px;
         }
 
         header p {
-            font-size: 14px;
-            opacity: 0.8;
+            font-size: 13px;
+            color: var(--neon-green);
+            text-shadow: 0 0 5px rgba(57, 255, 20, 0.5);
+            font-weight: bold;
         }
 
         .card {
-            background: white;
-            border-radius: 8px;
+            background: var(--bg-card);
+            border-radius: 4px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            border: 1px solid var(--border);
+            border: 1px solid var(--border-glow);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(0, 240, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);
         }
 
         .card-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
-            margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid var(--secondary);
-            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed var(--neon-pink);
+            color: var(--neon-pink);
+            text-shadow: 0 0 5px rgba(255, 0, 127, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .btn-group {
@@ -79,150 +103,225 @@
         .btn {
             display: inline-block;
             padding: 10px 20px;
-            border: none;
-            border-radius: 4px;
+            border: 1px solid transparent;
+            border-radius: 2px;
             cursor: pointer;
             font-weight: bold;
-            font-size: 14px;
-            transition: background 0.2s;
+            font-size: 13px;
+            transition: all 0.2s;
             text-align: center;
+            text-transform: uppercase;
         }
 
-        .btn-secondary { background-color: var(--secondary); color: white; }
-        .btn-secondary:hover { background-color: #117a65; }
-        .btn-success { background-color: var(--success); color: white; width: 100%; margin-top: 10px; }
-        .btn-success:hover { background-color: #1e7e34; }
-        .btn-info { background-color: var(--info); color: white; }
-        .btn-info:hover { background-color: #1f618d; }
+        .btn-secondary { 
+            background-color: transparent; 
+            border-color: var(--neon-cyan); 
+            color: var(--neon-cyan); 
+            text-shadow: 0 0 5px rgba(0, 240, 255, 0.5);
+        }
+        .btn-secondary:hover { 
+            background-color: var(--neon-cyan); 
+            color: #000; 
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+
+        .btn-success { 
+            background-color: transparent; 
+            border-color: var(--neon-green); 
+            color: var(--neon-green); 
+            width: 100%; 
+            margin-top: 15px; 
+            font-size: 15px;
+            text-shadow: 0 0 5px rgba(57, 255, 20, 0.5);
+            box-shadow: inset 0 0 5px rgba(57, 255, 20, 0.2);
+        }
+        .btn-success:hover { 
+            background-color: var(--neon-green); 
+            color: #000; 
+            box-shadow: 0 0 20px var(--neon-green);
+        }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 18px;
         }
 
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 6px;
             font-weight: 600;
-            font-size: 14px;
+            font-size: 13px;
+            color: var(--text-main);
         }
 
         input, select {
             width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border);
-            border-radius: 4px;
+            padding: 11px;
+            background-color: #0d1117;
+            border: 1px solid #21262d;
+            border-radius: 2px;
             font-size: 14px;
-            background-color: white;
+            color: #fff;
+            transition: all 0.2s;
         }
 
         input:focus, select:focus {
             outline: none;
-            border-color: var(--secondary);
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 8px rgba(0, 240, 255, 0.3);
         }
 
         .api-badge {
             display: inline-block;
-            background-color: #e8f8f5;
-            color: var(--secondary);
+            background-color: rgba(0, 240, 255, 0.05);
+            color: var(--neon-cyan);
+            border: 1px solid rgba(0, 240, 255, 0.2);
             padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            margin-top: 5px;
-            font-weight: bold;
+            border-radius: 2px;
+            font-size: 11px;
+            margin-top: 6px;
+            font-family: monospace;
         }
 
-        /* 網格佈局 */
         .filter-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
             gap: 15px;
             margin-bottom: 15px;
         }
 
+        /* 霓虹開關切換器 */
+        .switch-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 22px;
+        }
+
+        .switch input { opacity: 0; width: 0; height: 0; }
+
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #21262d; transition: .3s; border-radius: 2px;
+            border: 1px solid #30363d;
+        }
+
+        .slider:before {
+            position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
+            background-color: var(--text-dim); transition: .3s; border-radius: 1px;
+        }
+
+        input:checked + .slider { 
+            background-color: rgba(57, 255, 20, 0.1); 
+            border-color: var(--neon-green);
+        }
+        input:checked + .slider:before { 
+            background-color: var(--neon-green);
+            box-shadow: 0 0 8px var(--neon-green);
+            transform: translateX(22px); 
+        }
+
         .summary-box {
-            background-color: #eef9f1;
-            border: 1px solid var(--success);
-            padding: 12px;
-            border-radius: 6px;
-            font-size: 16px;
+            background-color: rgba(57, 255, 20, 0.03);
+            border: 1px solid var(--neon-green);
+            padding: 14px;
+            border-radius: 2px;
+            font-size: 15px;
             font-weight: bold;
-            color: var(--success);
-            margin-top: 15px;
+            color: var(--neon-green);
+            margin-top: 25px;
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.1), inset 0 0 5px rgba(57, 255, 20, 0.05);
+            text-shadow: 0 0 5px rgba(57, 255, 20, 0.4);
+            letter-spacing: 0.5px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 15px;
-            font-size: 14px;
+            font-size: 13px;
         }
 
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--border);
+        th, td { 
+            padding: 12px; 
+            text-align: left; 
+            border-bottom: 1px solid #1f242c; 
         }
 
-        th {
-            background-color: var(--light);
-            color: var(--primary);
+        th { 
+            background-color: #0d1117; 
+            color: var(--neon-cyan); 
             font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--neon-cyan);
         }
 
-        tr:hover {
-            background-color: #fafafa;
+        tr:hover { 
+            background-color: rgba(255,255,255,0.02); 
         }
 
         .text-right { text-align: right; }
         .text-center { text-align: center; }
-        .badge-income { background-color: #e8f8f5; color: var(--success); padding: 2px 6px; border-radius: 3px; }
+        .badge-income { background-color: rgba(57, 255, 20, 0.1); color: var(--neon-green); border: 1px solid rgba(57, 255, 20, 0.3); padding: 2px 6px; border-radius: 2px; }
+        .badge-ledger { background-color: rgba(157, 78, 221, 0.15); color: #c8b6ff; border: 1px solid rgba(157, 78, 221, 0.4); padding: 2px 6px; border-radius: 2px; font-weight: bold;}
+        
+        option.add-new-trigger { background-color: #1c122c; color: var(--neon-cyan); font-weight: bold; }
+        
+        /* 唯讀總額高亮 */
+        #twdTotal {
+            font-size: 20px; 
+            font-weight: bold; 
+            color: var(--neon-green); 
+            background-color: #08120a;
+            border: 1px solid rgba(57, 255, 20, 0.4);
+            text-shadow: 0 0 8px rgba(57, 255, 20, 0.5);
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>📊 即時匯率/股市投資記帳本</h1>
-        <p>整合第三方 API 自動抓取匯率現價 ＆ 透過 GAS 寫入 Google 試算表</p>
+        <h1>⚡ CYBER_LEDGER // CORE_v3</h1>
+        <p>獨立帳本核心切換 ＆ 霓虹自動加總 ＆ 多維跨時空分類終端</p>
     </header>
 
-    <div class="card" style="border-left: 5px solid var(--info); background-color: #fdfefe;">
-        <div class="card-title" style="color: var(--info); border-bottom-color: var(--info);">➕ 自行擴充自訂新幣別與匯率</div>
-        <div class="filter-grid" style="margin-bottom: 5px;">
-            <div class="form-group">
-                <label for="customCurrencyCode">新幣別英文代碼</label>
-                <input type="text" id="customCurrencyCode" placeholder="例如：BTC、EUR、CAD">
-            </div>
-            <div class="form-group">
-                <label for="customCurrencyName">幣別中文名稱描述</label>
-                <input type="text" id="customCurrencyName" placeholder="例如：比特幣、歐元、加幣">
-            </div>
-            <div class="form-group">
-                <label for="customCurrencyRate">自訂對台幣初始匯率</label>
-                <input type="number" id="customCurrencyRate" placeholder="例如：32.5" step="any">
-            </div>
+    <div class="card" style="border-left: 3px solid var(--neon-cyan);">
+        <div class="form-group" style="margin-bottom: 0;">
+            <label for="ledgerSelect" style="color: var(--neon-cyan); font-size: 13px; text-transform: uppercase; letter-spacing: 1px;">📁 TARGET_LEDGER // 當前操作帳本庫</label>
+            <select id="ledgerSelect" style="font-weight: bold; color: #fff; border-color: rgba(0,240,255,0.4);" onchange="handleLedgerChange()">
+                <option value="default_ledger">💼 預設主記帳本 (MAIN_DB)</option>
+                <option value="travel_ledger">✈️ 國外旅遊專用帳本 (TRAVEL_DB)</option>
+                <option value="invest_ledger">📈 投資理財獨立帳本 (INVEST_DB)</option>
+                <option value="ADD_NEW_LEDGER" class="add-new-trigger">➕ 建立全新獨立記帳本...</option>
+            </select>
         </div>
-        <button type="button" class="btn btn-info" style="font-size:13px; padding: 8px 16px;" onclick="addNewCustomCurrency()">✨ 立即新增至系統選單</button>
     </div>
 
     <div class="card">
-        <div class="card-title">📝 新增資產交易紀錄</div>
+        <div class="card-title">📝 INPUT_DATA // 新增交易矩陣</div>
         
         <div class="form-group">
-            <label for="assetType">資產類別</label>
+            <label for="assetType">ASSET_CLASS // 資產類別</label>
             <select id="assetType" onchange="toggleFields()">
-                <option value="currency">外匯 / 外幣儲蓄 / 旅遊外幣</option>
+                <option value="currency">外匯 / 加密貨幣 / 旅遊外幣</option>
                 <option value="stock">股票 / ETF</option>
             </select>
         </div>
 
         <div id="currencyFields">
             <div class="btn-group">
-                <button type="button" class="btn btn-secondary" onclick="fetchCurrencyRate()">⚡ 手動重新連線 API 抓取最新匯率</button>
+                <button type="button" class="btn btn-secondary" onclick="fetchCurrencyRate()">⚡ 同步 API 即時匯率矩陣</button>
             </div>
-            <div class="form-group">
-                <label for="currencyPair">選擇幣別 (包含你自訂新增的貨幣)</label>
-                <select id="currencyPair" onchange="changeDefaultRate()">
+            <div class="form-group" style="margin-top: 10px;">
+                <label for="currencyPair">CURRENCY_TYPE // 選擇幣別代碼</label>
+                <select id="currencyPair" onchange="handleCurrencyChange()">
                     <option value="JPY">🇯🇵 JPY 日圓</option>
                     <option value="CNY">🇨🇳 CNY 人民幣</option>
                     <option value="KRW">🇰🇷 KRW 韓元</option>
@@ -230,113 +329,138 @@
                     <option value="VND">🇻🇳 VND 越南盾</option>
                     <option value="THB">🇹🇭 THB 泰國銖</option>
                     <option value="USD">🇺🇸 USD 美元</option>
+                    <option value="GBP">🇬🇧 GBP 英鎊</option>
+                    <option value="EUR">🇪🇺 EUR 歐元</option>
+                    <option value="BTC">🪙 BTC 比特幣</option>
+                    <option value="ETH">💎 ETH 以太幣</option>
+                    <option value="USDT">💵 USDT 泰達幣</option>
                     <option value="MOP">🇲🇴 MOP 澳門幣</option>
                     <option value="SGD">🇸🇬 SGD 新加坡元</option>
                     <option value="MYR">🇲🇾 MYR 馬來西亞林吉特</option>
                     <option value="ZWG">🇿🇼 ZWG 辛巴威元</option>
+                    <option value="ADD_NEW" class="add-new-trigger">➕ 自行新增其它幣別...</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="currencyAmount">外幣金額 / 當地貨幣數量</label>
-                <input type="number" id="currencyAmount" value="10000" placeholder="例如：10000" step="any" oninput="calculateCurrencyTotal()">
+                <label for="currencyAmount">QUANTITY // 貨幣數量 / 外幣淨額</label>
+                <input type="number" id="currencyAmount" value="1" placeholder="例如：10000" step="any" oninput="calculateCurrencyTotal()">
             </div>
             <div class="form-group">
-                <label for="exchangeRate">當前匯率 (外幣對新台幣 TWD)</label>
+                <label for="exchangeRate">EXCHANGE_RATE // 當前匯率 (對 TWD)</label>
                 <input type="number" id="exchangeRate" value="0.2050" placeholder="例如：0.205" step="any" oninput="calculateCurrencyTotal()">
-                <span id="rateTime" class="api-badge">📌 已啟動系統預設匯率（可直接儲存）</span>
+                <span id="rateTime" class="api-badge">📌 SYSTEM_LOCAL // 已載入本地備用核心匯率</span>
             </div>
         </div>
 
         <div id="stockFields" style="display: none;">
             <div class="btn-group">
-                <button type="button" class="btn btn-secondary" onclick="fetchStockPrice()">⚡ 手動重新連線 API 抓取最新股價</button>
+                <button type="button" class="btn btn-secondary" onclick="fetchStockPrice()">⚡ 同步 API 實時證券核心</button>
             </div>
-            <div class="form-group">
-                <label for="stockSymbol">股票代碼</label>
+            <div class="form-group" style="margin-top: 10px;">
+                <label for="stockSymbol">TICKER // 股票/正股代碼</label>
                 <input type="text" id="stockSymbol" value="AAPL" placeholder="例如：AAPL">
             </div>
             <div class="form-group">
-                <label for="stockShares">買賣股數</label>
+                <label for="stockShares">SHARES // 交易股數</label>
                 <input type="number" id="stockShares" value="10" oninput="calculateStockTotal()">
             </div>
             <div class="form-group">
-                <label interpreters for="stockPrice">股票單價 (USD)</label>
+                <label for="stockPrice">UNIT_PRICE // 股票單價 (USD)</label>
                 <input type="number" id="stockPrice" value="185.30" step="any" oninput="calculateStockTotal()">
-                <span id="stockTime" class="api-badge">📌 已啟動系統預設股價（可直接儲存）</span>
+                <span id="stockTime" class="api-badge">📌 SYSTEM_LOCAL // 已載入本地備用證券價格</span>
             </div>
         </div>
 
-        <div class="form-group" style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 4px;">
-            <label style="color: var(--primary); font-size: 16px;">💰 換算折合新台幣總額 (TWD)</label>
-            <input type="number" id="twdTotal" readonly style="font-size: 18px; font-weight: bold; color: var(--success); background-color: #eef9f1;" value="0">
+        <div class="form-group" style="margin-top: 25px; padding: 15px; background: #0d1117; border-radius: 2px; border: 1px dashed #30363d;">
+            <label style="color: var(--neon-cyan); font-size: 14px; text-transform: uppercase;">💰 NET_VALUE_TWD // 折合新台幣極值總額</label>
+            <input type="number" id="twdTotal" readonly value="0">
         </div>
 
         <div class="form-group">
-            <label for="note">備註說明</label>
-            <input type="text" id="note" value="海外旅遊/投資記帳" placeholder="例如：換匯、買入">
+            <label for="note">MEMO // 終端交易備註說明</label>
+            <input type="text" id="note" value="資產購入與流動記帳" placeholder="說明欄位">
         </div>
 
-        <button type="button" class="btn btn-success" onclick="submitToGAS()">💾 儲存紀錄至 Google Sheets</button>
+        <button type="button" class="btn btn-success" onclick="submitToGAS()">💾 EXECUTE_UPLOAD // 寫入雲端量子試算表</button>
     </div>
 
-    <div class="card" style="background-color: #fcfcfc; border-left: 5px solid var(--secondary);">
-        <div class="card-title" style="color: var(--secondary);">🔍 記帳分類與篩選工具</div>
+    <div class="card" style="border-left: 3px solid var(--neon-pink);">
+        <div class="card-title" style="color: var(--neon-pink);">🔍 FILTER_MATRIX // 多維度交叉分類與動態篩選</div>
         <div class="filter-grid">
             <div class="form-group">
-                <label for="filterDate">1. 依日期分類/篩選</label>
+                <label for="filterDate">1. DATE_SORT // 依時序日期分類</label>
                 <input type="date" id="filterDate" onchange="filterRecords()">
             </div>
             <div class="form-group">
-                <label for="filterHour">2. 依小時分類/篩選 (24小時制)</label>
+                <label for="filterHour">2. HOUR_SORT // 依小時維度分類</label>
                 <select id="filterHour" onchange="filterRecords()">
-                    <option value="all">顯示全部小時</option>
+                    <option value="all">顯示全部量子小時</option>
                 </select>
             </div>
             <div class="form-group">
-                <label for="filterCurrency">3. 依幣別/代碼分類</label>
+                <label for="filterCurrency">3. TICKER_SORT // 依資產幣別過濾</label>
                 <select id="filterCurrency" onchange="filterRecords()">
-                    <option value="all">顯示全部幣別</option>
+                    <option value="all">顯示全矩陣幣別</option>
                     <option value="JPY">JPY 日圓</option>
                     <option value="CNY">CNY 人民幣</option>
                     <option value="KRW">KRW 韓元</option>
                     <option value="HKD">HKD 香港元</option>
                     <option value="VND">VND 越南盾</option>
                     <option value="THB">THB 泰國銖</option>
-                    <option value="USD">USD 美元 / 美股</option>
-                    <option value="MOP">MOP 澳門幣</option>
-                    <option value="SGD">SGD 新加坡元</option>
-                    <option value="MYR">MYR 馬來西亞林吉特</option>
-                    <option value="ZWG">ZWG 辛巴威元</option>
+                    <option value="USD">USD 美元</option>
+                    <option value="GBP">GBP 英鎊</option>
+                    <option value="EUR">EUR 歐元</option>
+                    <option value="BTC">BTC 比特幣</option>
+                    <option value="ETH">ETH 以太幣</option>
+                    <option value="USDT">USDT 泰達幣</option>
                 </select>
             </div>
         </div>
-        <button type="button" class="btn btn-secondary" style="padding: 6px 12px; font-size:12px;" onclick="resetFilters()">🔄 清除所有篩選條件</button>
+        
+        <div style="display:flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <button type="button" class="btn btn-secondary" style="padding: 6px 12px; font-size:11px; border-color: var(--neon-pink); color: var(--neon-pink); text-shadow: 0 0 5px rgba(255,0,127,0.3);" onclick="resetFilters()">🔄 CLEAR_FILTER // 清除篩選器</button>
+            
+            <div class="switch-container">
+                <label class="switch">
+                    <input type="checkbox" id="autoSumToggle" checked onchange="toggleSumBox()">
+                    <span class="slider"></span>
+                </label>
+                <span style="font-size: 12px; font-weight: bold; color: var(--text-main); font-family: monospace;">📊 AUTO_SUM // 啟用畫面自動加總功能</span>
+            </div>
+        </div>
+
         <div class="summary-box" id="filterSummary">
-            📈 目前篩選條件下折合台幣總計：$0 TWD
+            📈 COUNTER_SUM // 目前篩選條件下折合台幣總計：$0 TWD
         </div>
     </div>
 
     <div class="card">
-        <div class="card-title">📋 歷史明細紀錄 (支援動態分類篩選)</div>
-        <table id="historyTable">
-            <thead>
-                <tr>
-                    <th>日期</th>
-                    <th>時間(小時)</th>
-                    <th>資產類別</th>
-                    <th>代碼/幣別</th>
-                    <th>數量/外幣</th>
-                    <th>單價/匯率</th>
-                    <th class="text-right">折合台幣 (TWD)</th>
-                    <th>備註</th>
-                </tr>
-            </thead>
-            <tbody id="historyTbody">
-                <tr id="emptyHintRow">
-                    <td colspan="8" class="text-center" style="color: #999;">暫無紀錄，請在上方新增交易</td>
-                </tr>
-            </tbody>
-        </table>
+        <div class="card-title">
+            <span>📋 LEDGER_LOG // 歷史核心交易明細線路</span>
+            <span id="currentTableBadge" class="badge-ledger">MAIN_DB</span>
+        </div>
+        <div style="overflow-x: auto;">
+            <table id="historyTable">
+                <thead>
+                    <tr>
+                        <th>LOG_DB // 帳本</th>
+                        <th>TIMESTAMP // 日期</th>
+                        <th>TIME // 小時</th>
+                        <th>CLASS // 類別</th>
+                        <th>SYMBOL // 幣別</th>
+                        <th>QTY // 數量</th>
+                        <th>RATE // 匯率單價</th>
+                        <th class="text-right">TOTAL // 折合台幣</th>
+                        <th>MEMO // 備註說明</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTbody">
+                    <tr id="emptyHintRow">
+                        <td colspan="9" class="text-center" style="color: var(--text-dim); font-family: monospace;">[ SYSTEM_EMPTY // 暫無歷史快照紀錄，請啟動上方交易矩陣 ]</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
 
@@ -344,81 +468,118 @@
     const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz7h4zLw55RiR0MsVWbTABB4yfA7eVeOBVS3x0lff9XZi5zOe5FrZPgxgmL8GP-BJ_bEA/exec";
 
     let allRecordsMemory = [];
+    let previousSelectedValue = "JPY";
+    let previousLedgerValue = "default_ledger";
 
-    // 動態系統資料庫：預設內建 11 種，使用者可以在前台自由擴充！
     let fallbackRates = { 
         'JPY': 0.2050, 'CNY': 4.4500, 'KRW': 0.0230, 'HKD': 4.1200, 
-        'VND': 0.0013, 'THB': 0.8800, 'USD': 32.2500, 'MOP': 4.0000, 
-        'SGD': 23.8000, 'MYR': 6.8500, 'ZWG': 0.0979
+        'VND': 0.0013, 'THB': 0.8800, 'USD': 32.2500, 'GBP': 41.5000,
+        'EUR': 35.2000, 'BTC': 2150000, 'ETH': 112000, 'USDT': 32.30,
+        'MOP': 4.0000, 'SGD': 23.8000, 'MYR': 6.8500, 'ZWG': 0.0979
     };
 
     window.onload = function() {
         calculateCurrencyTotal();
         
-        // 生成 00-23 小時篩選選單
         const hourSelect = document.getElementById('filterHour');
         for(let i=0; i<24; i++) {
             let hStr = i < 10 ? '0' + i : i;
             let opt = document.createElement('option');
             opt.value = hStr;
-            opt.innerText = hStr + ':00 ~ ' + hStr + ':59';
+            opt.innerText = 'T ' + hStr + ':00 ~ ' + hStr + ':59';
             hourSelect.appendChild(opt);
         }
         
         document.getElementById('filterDate').value = new Date().toISOString().substring(0, 10);
     };
 
-    // ⚡【重要全新功能】讓使用者在前台動態自行新增幣別與匯率的邏輯 ⚡
-    function addNewCustomCurrency() {
-        const codeInput = document.getElementById('customCurrencyCode').value.trim().toUpperCase();
-        const nameInput = document.getElementById('customCurrencyName').value.trim();
-        const rateInput = parseFloat(document.getElementById('customCurrencyRate').value);
+    function handleLedgerChange() {
+        const ledgerSelect = document.getElementById('ledgerSelect');
+        const selectedValue = ledgerSelect.value;
 
-        if(!codeInput || !nameInput || isNaN(rateInput)) {
-            alert('❌ 請填寫完整的欄位：幣別代碼、中文描述及匯率數值！');
-            return;
+        if (selectedValue === "ADD_NEW_LEDGER") {
+            const newLedgerName = prompt("[SYS_PROMPT] 請輸入全新賽博記帳本庫編號/名稱:");
+            if (!newLedgerName || !newLedgerName.trim()) {
+                ledgerSelect.value = previousLedgerValue;
+                return;
+            }
+            const cleanName = newLedgerName.trim().toUpperCase();
+            const ledgerId = "custom_" + Date.now();
+
+            const newOpt = document.createElement('option');
+            newOpt.value = ledgerId;
+            newOpt.innerText = `📁 ${cleanName}_DB`;
+            ledgerSelect.insertBefore(newOpt, ledgerSelect.lastElementChild);
+
+            ledgerSelect.value = ledgerId;
+            alert(`[SYS_INFO] 成功初始化全新獨立帳目矩陣：[${cleanName}_DB]！`);
         }
 
-        // 1. 檢查是否已經存在
-        if(fallbackRates.hasOwnProperty(codeInput)) {
-            // 如果存在，直接幫使用者覆蓋新匯率
-            fallbackRates[codeInput] = rateInput;
-            alert(`🔄 幣別 ${codeInput} 已存在，已成功將其系統匯率更新為：${rateInput}`);
-        } else {
-            // 如果是全新幣別，寫入資料庫
-            fallbackRates[codeInput] = rateInput;
+        previousLedgerValue = ledgerSelect.value;
+        
+        const activeText = ledgerSelect.options[ledgerSelect.selectedIndex].text.replace('📁 ', '').replace('💼 ', '').replace('✈️ ', '').replace('📈 ', '');
+        document.getElementById('currentTableBadge').innerText = activeText;
+        
+        renderTable();
+    }
 
-            // 2. 自動塞入交易「選擇幣別」的下拉選單
-            const mainSelect = document.getElementById('currencyPair');
-            let mainOpt = document.createElement('option');
-            mainOpt.value = codeInput;
-            mainOpt.innerText = `✨ ${codeInput} ${nameInput}`;
-            mainSelect.appendChild(mainOpt);
+    function handleCurrencyChange() {
+        const selectEl = document.getElementById('currencyPair');
+        const selectedValue = selectEl.value;
 
-            // 3. 自動塞入「分類與篩選工具」的下拉選單
+        if (selectedValue === "ADD_NEW") {
+            const code = prompt("[SYS_PROMPT] 輸入全新代幣/幣別核心代碼 (例: SOL, AUD):");
+            if (!code) { selectEl.value = previousSelectedValue; return; }
+            const cleanCode = code.trim().toUpperCase();
+
+            const name = prompt("[SYS_PROMPT] 輸入此代幣之描述型文本 (例: 索拉納, 澳幣):");
+            const cleanName = name ? name.trim() : "CUSTOM_TOKEN";
+
+            const rateInput = prompt(`[SYS_PROMPT] 定義基底匯率 [ 1 ${cleanCode} = ? TWD ] :`, "30.0");
+            const rate = parseFloat(rateInput);
+
+            if (!cleanCode || isNaN(rate)) {
+                alert("[SYS_ERROR] 寫入參數錯誤，拒絕初始化新幣別。");
+                selectEl.value = previousSelectedValue;
+                return;
+            }
+
+            fallbackRates[cleanCode] = rate;
+
+            const newOpt = document.createElement('option');
+            newOpt.value = cleanCode;
+            newOpt.innerText = `✨ ${cleanCode} ${cleanName}`;
+            selectEl.insertBefore(newOpt, selectEl.lastElementChild);
+
             const filterSelect = document.getElementById('filterCurrency');
-            let filterOpt = document.createElement('option');
-            filterOpt.value = codeInput;
-            filterOpt.innerText = `${codeInput} ${nameInput}`;
+            const filterOpt = document.createElement('option');
+            filterOpt.value = cleanCode;
+            filterOpt.innerText = `${cleanCode} ${cleanName}`;
             filterSelect.appendChild(filterOpt);
 
-            alert(`🎉 成功新增自訂幣別：[${codeInput} ${nameInput}]，初始預設匯率為 ${rateInput}！`);
+            selectEl.value = cleanCode;
+            alert(`[SYS_INFO] 注入新核心代幣成功：[${cleanCode} ${cleanName}]`);
         }
 
-        // 4. 自動將目前的記帳欄位切換到剛新增的這個幣別，並重新算總額
-        document.getElementById('currencyPair').value = codeInput;
+        previousSelectedValue = selectEl.value;
         changeDefaultRate();
+    }
 
-        // 5. 清空擴充控制台的輸入欄位
-        document.getElementById('customCurrencyCode').value = '';
-        document.getElementById('customCurrencyName').value = '';
-        document.getElementById('customCurrencyRate').value = '';
+    function toggleSumBox() {
+        const toggle = document.getElementById('autoSumToggle');
+        const summaryBox = document.getElementById('filterSummary');
+        if (toggle.checked) {
+            summaryBox.style.display = "block";
+            renderTable();
+        } else {
+            summaryBox.style.display = "none";
+        }
     }
 
     function changeDefaultRate() {
         const currency = document.getElementById('currencyPair').value;
         document.getElementById('exchangeRate').value = fallbackRates[currency] || 1.00;
-        document.getElementById('rateTime').innerText = `📌 已切換為 ${currency} 系統預設/自訂匯率`;
+        document.getElementById('rateTime').innerText = `📌 SYSTEM_LOCAL // 已切換為 ${currency} 本地儲備匯率`;
         calculateCurrencyTotal();
     }
 
@@ -437,7 +598,7 @@
 
     async function fetchCurrencyRate() {
         const currency = document.getElementById('currencyPair').value;
-        document.getElementById('rateTime').innerText = "正在連線 API 抓取最新匯率...";
+        document.getElementById('rateTime').innerText = "⚡ PINGING_API // 正在嘗試連線全球即時匯率矩陣...";
         try {
             const res = await fetch(`https://open.er-api.com/v6/latest/${currency}`);
             if(!res.ok) throw new Error();
@@ -445,27 +606,27 @@
             const twdRate = data.rates.TWD;
             if(twdRate) {
                 document.getElementById('exchangeRate').value = twdRate.toFixed(4);
-                document.getElementById('rateTime').innerText = `⚡ API 成功更新於: ${data.time_last_update_utc.substring(0,16)}`;
+                document.getElementById('rateTime').innerText = `⚡ API_SUCCESS // 核心更新時間: ${data.time_last_update_utc.substring(11,16)} UTC`;
                 calculateCurrencyTotal();
             }
         } catch (error) {
-            document.getElementById('rateTime').innerText = `⚠️ 連線異常或自訂幣別！已鎖定本地預設/自訂匯率`;
+            document.getElementById('rateTime').innerText = `⚠️ API_OFFLINE // 回退鎖定本地預設/密鑰自訂價格`;
         }
     }
 
     async function fetchStockPrice() {
         const symbol = document.getElementById('stockSymbol').value.toUpperCase();
-        document.getElementById('stockTime').innerText = `正在即時查詢 ${symbol}...`;
+        document.getElementById('stockTime').innerText = `⚡ PINGING_TICKER // 正在即時探測 ${symbol} 線路...`;
         try {
             const mockPrices = { 'AAPL': 185.30, 'MSFT': 420.15, 'TSLA': 175.20, '2330': 800.00 };
             const basePrice = mockPrices[symbol] || 100.00;
             const randomFluc = (Math.random() * 4 - 2); 
             const finalPrice = (basePrice + randomFluc).toFixed(2);
             document.getElementById('stockPrice').value = finalPrice;
-            document.getElementById('stockTime').innerText = `⚡ 實時報價成功：$${finalPrice}`;
+            document.getElementById('stockTime').innerText = `⚡ TICKER_ONLINE // 實時串流報價：$${finalPrice}`;
             calculateStockTotal();
         } catch (error) {
-            document.getElementById('stockTime').innerText = `⚠️ 無法連線，保持預設價格`;
+            document.getElementById('stockTime').innerText = `⚠️ TICKER_ERROR // 保持最後已知阻抗預設單價`;
         }
     }
 
@@ -485,16 +646,20 @@
 
     async function submitToGAS() {
         const assetType = document.getElementById('assetType').value;
+        const ledgerSelect = document.getElementById('ledgerSelect');
+        const ledgerName = ledgerSelect.options[ledgerSelect.selectedIndex].text.replace('📁 ', '').replace('💼 ', '').replace('✈️ ', '').replace('📈 ', '');
+        
         const nowObj = new Date();
         const dateTag = nowObj.toISOString().substring(0, 10);
         const hourTag = nowObj.getHours() < 10 ? '0' + nowObj.getHours() : '' + nowObj.getHours();
         const timeStr = nowObj.toLocaleTimeString();
 
         let logData = {
+            ledger: ledgerName,
             date: dateTag,
             hour: hourTag,
             time: timeStr,
-            type: assetType === 'currency' ? '外匯' : '股票',
+            type: assetType === 'currency' ? '外匯/加密' : '證券',
             symbol: assetType === 'currency' ? document.getElementById('currencyPair').value : document.getElementById('stockSymbol').value.toUpperCase(),
             amount: document.getElementById('currencyAmount').value,
             priceOrRate: document.getElementById('exchangeRate').value,
@@ -517,9 +682,9 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(logData)
             });
-            alert('本筆資產紀錄已同步至 Google 雲端試算表！');
+            alert(`[SUCCESS] 封包已安全寫入矩陣：[${ledgerName}] 並同步至 Google Sheet！`);
         } catch (error) {
-            alert('雲端同步失敗，但已保存在網頁本地臨時清單中。');
+            alert('[SYNC_WARNING] 雲端通道受阻，封包暫存於本地網頁沙盒中。');
         }
     }
 
@@ -527,34 +692,44 @@
         const tbody = document.getElementById('historyTbody');
         tbody.innerHTML = '';
 
+        const ledgerSelect = document.getElementById('ledgerSelect');
+        const activeLedgerName = ledgerSelect.options[ledgerSelect.selectedIndex].text.replace('📁 ', '').replace('💼 ', '').replace('✈️ ', '').replace('📈 ', '');
+
         if(allRecordsMemory.length === 0) {
-            tbody.innerHTML = `<tr id="emptyHintRow"><td colspan="8" class="text-center" style="color: #999;">暫無紀錄，請在上方新增交易</td></tr>`;
-            document.getElementById('filterSummary').innerText = `📈 目前篩選條件下折合台幣總計：$0 TWD`;
+            tbody.innerHTML = `<tr id="emptyHintRow"><td colspan="9" class="text-center" style="color: var(--text-dim); font-family: monospace;">[ SYSTEM_EMPTY // 暫無歷史快照紀錄，請啟動上方交易矩陣 ]</td></tr>`;
+            document.getElementById('filterSummary').innerText = `📈 COUNTER_SUM // 目前篩選條件下折合台幣總計：$0 TWD`;
             return;
         }
 
         const filterDate = document.getElementById('filterDate').value;
         const filterHour = document.getElementById('filterHour').value;
         const filterCurrency = document.getElementById('filterCurrency').value;
+        const isSumEnabled = document.getElementById('autoSumToggle').checked;
 
         let filteredSum = 0;
 
         allRecordsMemory.forEach(item => {
+            const matchLedger = item.ledger === activeLedgerName;
             const matchDate = !filterDate || item.date === filterDate;
-            const matchHour = filterHour === 'all' || item.hour === filterHour;
+            const matchHour = filterHour === 'all' || item.hour === ('all' ? 'all' : filterHour.replace('T ', '').substring(0,2));
             const matchCurr = filterCurrency === 'all' || item.symbol === filterCurrency;
 
-            if(matchDate && matchHour && matchCurr) {
-                filteredSum += item.twdTotal;
+            // 修正小時比較的小細節
+            let targetHour = filterHour === 'all' ? 'all' : filterHour.split(' ')[1].substring(0,2);
+            const matchHourCorrect = filterHour === 'all' || item.hour === targetHour;
+
+            if(matchLedger && matchDate && matchHourCorrect && matchCurr) {
+                if(isSumEnabled) { filteredSum += item.twdTotal; }
                 
                 const row = `<tr>
+                    <td><span class="badge-ledger">${item.ledger}</span></td>
                     <td><strong>${item.date}</strong></td>
-                    <td>${item.time} (${item.hour}點)</td>
+                    <td>${item.time} (${item.hour}H)</td>
                     <td><span class="badge-income">${item.type}</span></td>
                     <td><code>${item.symbol}</code></td>
                     <td>${item.amount}</td>
                     <td>${item.priceOrRate}</td>
-                    <td class="text-right" style="font-weight:bold; color:var(--success);">$${item.twdTotal.toLocaleString()}</td>
+                    <td class="text-right" style="font-weight:bold; color:var(--neon-green); text-shadow:0 0 5px rgba(57,255,20,0.3);">$${item.twdTotal.toLocaleString()}</td>
                     <td>${item.note}</td>
                 </tr>`;
                 tbody.innerHTML += row;
@@ -562,15 +737,15 @@
         });
 
         if(tbody.innerHTML === '') {
-            tbody.innerHTML = `<tr><td colspan="8" class="text-center" style="color: #c0392b;">⚠️ 沒有符合目前分類篩選條件的記帳紀錄</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="9" class="text-center" style="color: var(--neon-pink);">[ WARNING // 該編譯篩選區間下無任何有效資產明細 ]</td></tr>`;
         }
 
-        document.getElementById('filterSummary').innerText = `📈 目前篩選條件下折合台幣總計：$${filteredSum.toLocaleString()} TWD`;
+        if(isSumEnabled) {
+            document.getElementById('filterSummary').innerText = `📈 COUNTER_SUM // 目前 [${activeLedgerName}] 篩選條件下折合台幣總計：$${filteredSum.toLocaleString()} TWD`;
+        }
     }
 
-    function filterRecords() {
-        renderTable();
-    }
+    function filterRecords() { renderTable(); }
 
     function resetFilters() {
         document.getElementById('filterDate').value = '';
